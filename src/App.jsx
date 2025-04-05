@@ -19,8 +19,8 @@ function App() {
           'Content-Type': 'multipart/form-data',
         },
       });
-      console.log("예측 결과:", res.data); // 디버깅용
-      setResult(res.data);
+      console.log("예측 결과:", res.data);
+      setResult(res.data.predictions); // ✅ 이 부분만 바꾸면 돼!
     } catch (err) {
       console.error('업로드 실패:', err);
       alert('예측 요청에 실패했습니다.');
