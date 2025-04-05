@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import axios from 'axios'; // axios import 추가
+import axios from 'axios';
 
 function App() {
   const [image, setImage] = useState(null);
@@ -19,6 +19,7 @@ function App() {
           'Content-Type': 'multipart/form-data',
         },
       });
+      console.log("예측 결과:", res.data); // 디버깅용
       setResult(res.data);
     } catch (err) {
       console.error('업로드 실패:', err);
@@ -40,7 +41,7 @@ function App() {
       <input type="file" accept="image/*" onChange={handleFileChange} />
       <button onClick={handleUpload} style={{ marginLeft: 10 }}>업로드</button>
 
-      {result && (
+      {result?.results?.length > 0 && (
         <div style={{ marginTop: '2rem' }}>
           <h3>진단 결과</h3>
           {result.results.map((item, idx) => (
@@ -54,7 +55,7 @@ function App() {
               <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                 <strong>{item.disease}</strong>
                 <span style={{
-                  backgroundColor: severityColor[item.severity],
+                  backgroundColor: severityColor[item.severity] || '#ccc',
                   padding: '0.2rem 0.6rem',
                   borderRadius: '999px',
                   fontWeight: 'bold',
@@ -67,7 +68,6 @@ function App() {
                 신뢰도: {item.confidence}
               </div>
 
-              {/* 제품 추천 출력 */}
               {item.recommendations && (
                 <div style={{ marginTop: '1rem' }}>
                   <strong>추천 제품</strong>
@@ -81,12 +81,10 @@ function App() {
                 </div>
               )}
 
-              {/* 코멘트 */}
               {item.comment && (
                 <div style={{ marginTop: '1rem', color: '#16a34a' }}>{item.comment}</div>
               )}
 
-              {/* 병원 추천 안내 */}
               {item.hospital_recommendation && (
                 <div style={{ marginTop: '1rem', color: '#dc2626' }}>
                   {item.hospital_recommendation}
