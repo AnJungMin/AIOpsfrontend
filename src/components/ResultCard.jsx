@@ -3,8 +3,6 @@ import { useState } from "react";
 export default function ResultCard({ item, recommendationsJson }) {
   const [open, setOpen] = useState(false);
 
-  const handleClick = () => setOpen(!open);
-
   const severityStyle = {
     정상: "bg-green-100 text-green-700",
     경증: "bg-yellow-100 text-yellow-700",
@@ -19,7 +17,9 @@ export default function ResultCard({ item, recommendationsJson }) {
     중증: "bg-red-400",
   };
 
+  const handleClick = () => setOpen(!open);
   const recsFromJson = recommendationsJson?.[item.disease] || [];
+  const confidencePercent = Math.min(100, Number(item.confidence).toFixed(2));
 
   return (
     <div
@@ -27,7 +27,7 @@ export default function ResultCard({ item, recommendationsJson }) {
       className="bg-white dark:bg-gray-800 border rounded-xl p-4 mb-4 shadow-sm hover:shadow-md cursor-pointer transition"
     >
       <div className="flex justify-between items-center mb-2">
-        <h4 className="text-lg font-semibold">{item.disease}</h4>
+        <h4 className="text-base font-semibold">{item.disease}</h4>
         <span
           className={`text-sm px-3 py-1 rounded-full font-medium ${severityStyle[item.severity]}`}
         >
@@ -39,24 +39,26 @@ export default function ResultCard({ item, recommendationsJson }) {
       <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
         <div
           className={`h-2 rounded-full ${barColor[item.severity]}`}
-          style={{ width: `${item.confidence}%` }}
+          style={{ width: `${confidencePercent}%` }}
         />
       </div>
 
-      <p className="text-sm text-gray-500 mb-2">
-        신뢰도: {parseFloat(item.confidence).toFixed(2)}%
+      <p className="text-sm text-gray-500">
+        신뢰도: {confidencePercent}%
       </p>
 
       {/* Detail area */}
       {open && (
-        <div className="text-sm mt-3 space-y-2">
+        <div className="text-sm mt-4 space-y-2">
           {item.severity === "정상" && (
-            <p className="text-green-600">{item.comment || "정상 범위입니다. 두피 상태가 양호합니다."}</p>
+            <p className="text-green-600">
+              {item.comment || "정상 범위입니다. 두피 상태가 양호합니다."}
+            </p>
           )}
 
           {(item.severity === "경증" || item.severity === "중등증") && recsFromJson.length > 0 && (
             <div>
-              <strong className="block mb-1">추천 제품</strong>
+              <strong className="block mb-1 text-gray-700 dark:text-gray-300">추천 제품</strong>
               <ul className="list-disc list-inside space-y-1">
                 {recsFromJson.map((rec, idx) => (
                   <li key={idx}>
