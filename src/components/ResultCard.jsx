@@ -19,7 +19,15 @@ export default function ResultCard({ item, recommendationsJson }) {
 
   const handleClick = () => setOpen(!open);
   const recsFromJson = recommendationsJson?.[item.disease] || [];
-  const confidencePercent = Math.min(100, Number(item.confidence).toFixed(2));
+
+  // NaN 방지: % 제거 후 숫자로 변환
+  const rawConfidence = item.confidence || "0";
+  const numericConfidence = parseFloat(
+    typeof rawConfidence === "string" ? rawConfidence.replace("%", "") : rawConfidence
+  );
+  const confidencePercent = isNaN(numericConfidence)
+    ? 0
+    : Math.min(100, numericConfidence.toFixed(2));
 
   return (
     <div
@@ -56,22 +64,27 @@ export default function ResultCard({ item, recommendationsJson }) {
             </p>
           )}
 
-          {(item.severity === "경증" || item.severity === "중등증") && recsFromJson.length > 0 && (
-            <div>
-              <strong className="block mb-1 text-gray-700 dark:text-gray-300">추천 제품</strong>
-              <ul className="list-disc list-inside space-y-1">
-                {recsFromJson.map((rec, idx) => (
-                  <li key={idx}>
-                    {rec.product_name} ({rec.category}) - 유사도: {(rec.similarity * 100).toFixed(2)}%
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
+          {(item.severity === "경증" || item.severity === "중등증") &&
+            recsFromJson.length > 0 && (
+              <div>
+                <strong className="block mb-1 text-gray-700 dark:text-gray-300">
+                  추천 제품
+                </strong>
+                <ul className="list-disc list-inside space-y-1">
+                  {recsFromJson.map((rec, idx) => (
+                    <li key={idx}>
+                      {rec.product_name} ({rec.category}) - 유사도:{" "}
+                      {(rec.similarity * 100).toFixed(2)}%
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
           {item.severity === "중증" && (
             <p className="text-red-600 font-semibold">
-              {item.hospital_recommendation || "증상이 심각할 수 있어 피부과 방문을 권장합니다."}
+              {item.hospital_recommendation ||
+                "증상이 심각할 수 있어 피부과 방문을 권장합니다."}
             </p>
           )}
         </div>
