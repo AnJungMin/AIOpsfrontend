@@ -18,7 +18,15 @@ export default function ResultCard({ item, recommendationsJson }) {
   };
 
   const handleClick = () => setOpen(!open);
-  const recsFromJson = recommendationsJson?.[item.disease] || [];
+
+  // 🔧 질환명 정제 (앞뒤 공백 제거)
+  const cleanKey = item.disease?.trim();
+  const recsFromJson = recommendationsJson?.[cleanKey] || [];
+
+  // 🪵 디버깅용 로그
+  console.log("질환명:", item.disease);
+  console.log("cleanKey:", cleanKey);
+  console.log("추천 제품:", recsFromJson);
 
   // NaN 방지: % 제거 후 숫자로 변환
   const rawConfidence = item.confidence || "0";
@@ -35,7 +43,7 @@ export default function ResultCard({ item, recommendationsJson }) {
       className="bg-white dark:bg-gray-800 border rounded-xl p-4 mb-4 shadow-sm hover:shadow-md cursor-pointer transition"
     >
       <div className="flex justify-between items-center mb-2">
-        <h4 className="text-base font-semibold">{item.disease}</h4>
+        <h4 className="text-base font-semibold">{cleanKey}</h4>
         <span
           className={`text-sm px-3 py-1 rounded-full font-medium ${severityStyle[item.severity]}`}
         >
@@ -51,9 +59,7 @@ export default function ResultCard({ item, recommendationsJson }) {
         />
       </div>
 
-      <p className="text-sm text-gray-500">
-        신뢰도: {confidencePercent}%
-      </p>
+      <p className="text-sm text-gray-500">신뢰도: {confidencePercent}%</p>
 
       {/* Detail area */}
       {open && (
@@ -64,27 +70,22 @@ export default function ResultCard({ item, recommendationsJson }) {
             </p>
           )}
 
-          {(item.severity === "경증" || item.severity === "중등증") &&
-            recsFromJson.length > 0 && (
-              <div>
-                <strong className="block mb-1 text-gray-700 dark:text-gray-300">
-                  추천 제품
-                </strong>
-                <ul className="list-disc list-inside space-y-1">
-                  {recsFromJson.map((rec, idx) => (
-                    <li key={idx}>
-                      {rec.product_name} ({rec.category}) - 유사도:{" "}
-                      {(rec.similarity * 100).toFixed(2)}%
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+          {(item.severity === "경증" || item.severity === "중등증") && recsFromJson.length > 0 && (
+            <div>
+              <strong className="block mb-1 text-gray-700 dark:text-gray-300">추천 제품</strong>
+              <ul className="list-disc list-inside space-y-1">
+                {recsFromJson.map((rec, idx) => (
+                  <li key={idx}>
+                    {rec.product_name} ({rec.category}) - 유사도: {(rec.similarity * 100).toFixed(2)}%
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           {item.severity === "중증" && (
             <p className="text-red-600 font-semibold">
-              {item.hospital_recommendation ||
-                "증상이 심각할 수 있어 피부과 방문을 권장합니다."}
+              {item.hospital_recommendation || "증상이 심각할 수 있어 피부과 방문을 권장합니다."}
             </p>
           )}
         </div>
