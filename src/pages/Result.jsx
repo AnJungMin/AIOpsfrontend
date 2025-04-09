@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ResultCard from "../components/ResultCard";
+import recommendationsJson from "../data/recommendations.json"; // ✅ JSON 불러오기
 
 export default function Result() {
   const navigate = useNavigate();
@@ -11,7 +12,6 @@ export default function Result() {
       const stored = localStorage.getItem("scalpcare_result");
       const parsed = stored ? JSON.parse(stored) : null;
 
-      // 🔍 객체 안에 results가 있는 경우 처리
       const finalResult = Array.isArray(parsed)
         ? parsed
         : Array.isArray(parsed?.results)
@@ -32,18 +32,15 @@ export default function Result() {
     }
   }, [navigate]);
 
-  const severityColor = {
-    정상: "bg-lime-400",
-    경증: "bg-yellow-400",
-    중등증: "bg-orange-400",
-    중증: "bg-red-400",
-  };
-
   return (
     <section>
       <h3 className="text-xl font-semibold mb-4">진단 결과</h3>
       {result.map((item, idx) => (
-        <ResultCard key={idx} item={item} severityColor={severityColor} />
+        <ResultCard
+          key={idx}
+          item={item}
+          recommendationsJson={recommendationsJson} // ✅ props로 전달
+        />
       ))}
     </section>
   );
