@@ -27,8 +27,12 @@ export default function Home() {
         body: formData,
       });
       const data = await res.json();
-      // 👉 결과 페이지로 이동하면서 상태 전달
-      navigate("/result", { state: { predictions: data.predictions } });
+
+      // ✅ localStorage에 저장
+      localStorage.setItem("scalpcare_result", JSON.stringify(data.predictions));
+
+      // ✅ state 없이 이동
+      navigate("/result");
     } catch (err) {
       alert("예측 요청에 실패했습니다.");
       console.error(err);

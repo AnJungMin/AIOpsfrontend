@@ -1,19 +1,21 @@
-import { useLocation, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import ResultCard from "../components/ResultCard";
 
 export default function Result() {
-  const location = useLocation();
   const navigate = useNavigate();
-  const result = location.state?.predictions;
+  const [result, setResult] = useState(null);
 
-  // 🔐 상태 없을 경우 홈으로 자동 리디렉션
   useEffect(() => {
-    if (!result || result.length === 0) {
-      alert("결과가 없습니다. 홈으로 돌아갑니다.");
+    const stored = localStorage.getItem("scalpcare_result");
+
+    if (!stored) {
+      alert("예측 결과가 없습니다. 홈으로 돌아갑니다.");
       navigate("/");
+    } else {
+      setResult(JSON.parse(stored));
     }
-  }, [result, navigate]);
+  }, [navigate]);
 
   const severityColor = {
     정상: "bg-lime-400",
@@ -22,7 +24,6 @@ export default function Result() {
     중증: "bg-red-400",
   };
 
-  // ✅ result가 없으면 아무것도 렌더링하지 않음
   if (!result) return null;
 
   return (
