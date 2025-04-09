@@ -1,40 +1,71 @@
-export default function ResultCard({ item, severityColor }) {
-    return (
-      <div className="border rounded-xl p-6 mb-6 bg-white dark:bg-gray-800 shadow-sm space-y-3">
-        <div className="flex justify-between items-center">
-          <strong className="text-lg">{item.disease}</strong>
-          <span
-            className={`text-sm text-white px-3 py-1 rounded-full font-semibold ${severityColor[item.severity]}`}
-          >
-            {item.severity}
-          </span>
-        </div>
-  
-        <p className="text-sm text-gray-500">신뢰도: {item.confidence}</p>
-  
-        {item.comment && (
-          <p className="text-green-600 font-medium">{item.comment}</p>
-        )}
-  
-        {item.hospital_recommendation && (
-          <p className="text-red-600 font-medium">{item.hospital_recommendation}</p>
-        )}
-  
-        {item.recommendations?.length > 0 && (
-          <div>
-            <strong className="block mb-1">추천 제품</strong>
-            <ul className="list-disc list-inside text-sm space-y-1">
-              {item.recommendations.map((rec, idx) => (
-                <li key={idx}>
-                  <span className="font-medium">{rec.name}</span>
-                  <span className="text-gray-400"> ({rec.category})</span>
-                  <span className="ml-2 text-xs text-gray-500">유사도: {rec.similarity}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+import { useState } from "react";
+
+export default function ResultCard({ item }) {
+  const [open, setOpen] = useState(false);
+
+  const severityColor = {
+    정상: "bg-green-200 text-green-800",
+    경증: "bg-yellow-200 text-yellow-800",
+    중등증: "bg-orange-200 text-orange-800",
+    중증: "bg-red-200 text-red-800",
+  };
+
+  const barColor = {
+    정상: "bg-green-500",
+    경증: "bg-yellow-500",
+    중등증: "bg-orange-500",
+    중증: "bg-red-500",
+  };
+
+  const handleClick = () => setOpen(!open);
+
+  return (
+    <div
+      className="bg-white dark:bg-gray-800 border rounded-lg p-4 mb-4 shadow cursor-pointer"
+      onClick={handleClick}
+    >
+      {/* 상단: 이름 + 뱃지 */}
+      <div className="flex justify-between items-center mb-2">
+        <strong className="text-lg">{item.disease}</strong>
+        <span className={`px-3 py-1 text-sm rounded-full ${severityColor[item.severity]}`}>
+          {item.severity}
+        </span>
       </div>
-    );
-  }
-  
+
+      {/* Progress Bar */}
+      <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+        <div
+          className={`${barColor[item.severity]} h-2 rounded-full`}
+          style={{ width: `${item.confidence}%` }}
+        />
+      </div>
+      <p className="text-sm text-gray-500 mb-2">신뢰도: {item.confidence}%</p>
+
+      {/* 상세 정보: 클릭 시 열림 */}
+      {open && (
+        <div className="mt-3 text-sm">
+          {item.severity === "정상" && (
+            <p className="text-green-600">{item.comment || "정상 범위입니다. 두피 상태가 양호합니다."}</p>
+          )}
+
+          {(item.severity === "경증" || item.severity === "중등증") && item.recommendations && (
+            <>
+              <strong>추천 제품</strong>
+              <ul className="list-disc list-inside mt-1 text-gray-700 dark:text-gray-300">
+                {item.recommendations.map((rec, i) => (
+                  <li key={i}>
+                    {rec.name} ({rec.category}) - 유사도: {rec.similarity}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+
+          {item.severity === "중증" && item.hospital_recommendation && (
+            <p className="text-red-600 font-medium">{item.hospital_recommendation}</p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
