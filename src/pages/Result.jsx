@@ -4,16 +4,31 @@ import ResultCard from "../components/ResultCard";
 
 export default function Result() {
   const navigate = useNavigate();
-  const [result, setResult] = useState(null);
+  const [result, setResult] = useState([]);
 
   useEffect(() => {
-    const stored = localStorage.getItem("scalpcare_result");
+    try {
+      const stored = localStorage.getItem("scalpcare_result");
+      const parsed = stored ? JSON.parse(stored) : null;
 
-    if (!stored) {
-      alert("예측 결과가 없습니다. 홈으로 돌아갑니다.");
+      // 🔍 객체 안에 results가 있는 경우 처리
+      const finalResult = Array.isArray(parsed)
+        ? parsed
+        : Array.isArray(parsed?.results)
+        ? parsed.results
+        : [];
+
+      if (!finalResult.length) {
+        alert("예측 결과가 없습니다. 홈으로 돌아갑니다.");
+        navigate("/");
+        return;
+      }
+
+      setResult(finalResult);
+    } catch (err) {
+      console.error("결과 파싱 중 오류:", err);
+      alert("결과를 불러오지 못했습니다.");
       navigate("/");
-    } else {
-      setResult(JSON.parse(stored));
     }
   }, [navigate]);
 
@@ -23,8 +38,6 @@ export default function Result() {
     중등증: "bg-orange-400",
     중증: "bg-red-400",
   };
-
-  if (!result) return null;
 
   return (
     <section>
