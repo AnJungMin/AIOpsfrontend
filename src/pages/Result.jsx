@@ -1,9 +1,19 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import ResultCard from "../components/ResultCard";
 
 export default function Result() {
   const location = useLocation();
+  const navigate = useNavigate();
   const result = location.state?.predictions;
+
+  // 🔐 상태 없을 경우 홈으로 자동 리디렉션
+  useEffect(() => {
+    if (!result || result.length === 0) {
+      alert("결과가 없습니다. 홈으로 돌아갑니다.");
+      navigate("/");
+    }
+  }, [result, navigate]);
 
   const severityColor = {
     정상: "bg-lime-400",
@@ -12,11 +22,8 @@ export default function Result() {
     중증: "bg-red-400",
   };
 
-  if (!result || result.length === 0) {
-    return (
-      <p className="text-center text-gray-500">진단 결과가 없습니다. 먼저 사진을 업로드해주세요.</p>
-    );
-  }
+  // ✅ result가 없으면 아무것도 렌더링하지 않음
+  if (!result) return null;
 
   return (
     <section>
