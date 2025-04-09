@@ -1,41 +1,17 @@
-// src/components/UploadForm.jsx
-import React, { useState } from 'react';
-import axios from 'axios';
-
-function UploadForm() {
-  const [image, setImage] = useState(null);
-  const [result, setResult] = useState(null);
-
-  const handleChange = (e) => {
-    setImage(e.target.files[0]);
-  };
-
-  const handleUpload = async () => {
-    if (!image) return;
-    const formData = new FormData();
-    formData.append('file', image);
-
-    try {
-      const res = await axios.post('https://test2-o3ij.onrender.com/api/predict', formData);
-      setResult(res.data);
-    } catch (err) {
-      console.error(err);
-      alert('업로드 실패');
-    }
-  };
-
+export default function UploadForm({ onFileChange, onUpload }) {
   return (
-    <div>
-      <input type="file" accept="image/*" onChange={handleChange} />
-      <button onClick={handleUpload}>진단하기</button>
-
-      {result && (
-        <pre style={{ textAlign: 'left' }}>
-          {JSON.stringify(result, null, 2)}
-        </pre>
-      )}
-    </div>
+    <section className="text-center mb-8">
+      <h2 className="text-3xl font-bold mb-2">두피 질환 AI 진단</h2>
+      <p className="text-gray-600 dark:text-gray-300 mb-4">
+        두피 사진을 업로드하면 AI가 자동으로 질환을 분석하고 맞춤 추천을 드려요.
+      </p>
+      <input type="file" accept="image/*" onChange={onFileChange} />
+      <button
+        onClick={onUpload}
+        className="ml-3 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-md"
+      >
+        진단 시작
+      </button>
+    </section>
   );
 }
-
-export default UploadForm;
