@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ResultCard from "../components/ResultCard";
-import recommendationsJson from "../data/recommendations.json"; // ✅ JSON 불러오기
+import recommendationsJson from "../data/recommendations.json";
 
 export default function Result() {
   const navigate = useNavigate();
@@ -33,15 +33,20 @@ export default function Result() {
   }, [navigate]);
 
   return (
-    <section>
-      <h3 className="text-xl font-semibold mb-4">진단 결과</h3>
-      {result.map((item, idx) => (
-        <ResultCard
-          key={idx}
-          item={item}
-          recommendationsJson={recommendationsJson} // ✅ props로 전달
-        />
-      ))}
+    <section className="max-w-3xl mx-auto px-4 py-8 bg-gray-50 dark:bg-gray-900 rounded-xl shadow">
+      <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+        진단 결과
+      </h3>
+
+      <div className="space-y-4">
+        {result.map((item, idx) => (
+          <ResultCard
+            key={idx}
+            item={item}
+            recommendationsJson={recommendationsJson}
+          />
+        ))}
+      </div>
     </section>
   );
 }

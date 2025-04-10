@@ -4,10 +4,10 @@ export default function ResultCard({ item, recommendationsJson }) {
   const [open, setOpen] = useState(false);
 
   const severityStyle = {
-    정상: "bg-green-100 text-green-700",
-    경증: "bg-yellow-100 text-yellow-700",
-    중등증: "bg-orange-100 text-orange-700",
-    중증: "bg-red-100 text-red-700",
+    정상: "bg-green-100 text-green-800",
+    경증: "bg-yellow-100 text-yellow-800",
+    중등증: "bg-orange-100 text-orange-800",
+    중증: "bg-red-100 text-red-800",
   };
 
   const barColor = {
@@ -19,16 +19,9 @@ export default function ResultCard({ item, recommendationsJson }) {
 
   const handleClick = () => setOpen(!open);
 
-  // 🔧 질환명 정제 (앞뒤 공백 제거)
   const cleanKey = item.disease?.trim();
   const recsFromJson = recommendationsJson?.[cleanKey] || [];
 
-  // 🪵 디버깅용 로그
-  console.log("질환명:", item.disease);
-  console.log("cleanKey:", cleanKey);
-  console.log("추천 제품:", recsFromJson);
-
-  // NaN 방지: % 제거 후 숫자로 변환
   const rawConfidence = item.confidence || "0";
   const numericConfidence = parseFloat(
     typeof rawConfidence === "string" ? rawConfidence.replace("%", "") : rawConfidence
@@ -40,10 +33,10 @@ export default function ResultCard({ item, recommendationsJson }) {
   return (
     <div
       onClick={handleClick}
-      className="bg-white dark:bg-gray-800 border rounded-xl p-4 mb-4 shadow-sm hover:shadow-md cursor-pointer transition"
+      className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 mb-5 shadow hover:shadow-md transition cursor-pointer"
     >
-      <div className="flex justify-between items-center mb-2">
-        <h4 className="text-base font-semibold">{cleanKey}</h4>
+      <div className="flex justify-between items-center mb-3">
+        <h4 className="text-lg font-bold text-gray-900 dark:text-white">{cleanKey}</h4>
         <span
           className={`text-sm px-3 py-1 rounded-full font-medium ${severityStyle[item.severity]}`}
         >
@@ -51,19 +44,19 @@ export default function ResultCard({ item, recommendationsJson }) {
         </span>
       </div>
 
-      {/* Progress bar */}
-      <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-2 overflow-hidden">
         <div
-          className={`h-2 rounded-full ${barColor[item.severity]}`}
+          className={`h-2 ${barColor[item.severity]}`}
           style={{ width: `${confidencePercent}%` }}
         />
       </div>
 
-      <p className="text-sm text-gray-500">신뢰도: {confidencePercent}%</p>
+      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+        신뢰도: {confidencePercent}%
+      </p>
 
-      {/* Detail area */}
       {open && (
-        <div className="text-sm mt-4 space-y-2">
+        <div className="text-sm mt-3 space-y-2">
           {item.severity === "정상" && (
             <p className="text-green-600">
               {item.comment || "정상 범위입니다. 두피 상태가 양호합니다."}
@@ -72,11 +65,14 @@ export default function ResultCard({ item, recommendationsJson }) {
 
           {(item.severity === "경증" || item.severity === "중등증") && recsFromJson.length > 0 && (
             <div>
-              <strong className="block mb-1 text-gray-700 dark:text-gray-300">추천 제품</strong>
-              <ul className="list-disc list-inside space-y-1">
+              <strong className="block font-semibold text-gray-800 dark:text-gray-200 mb-1">
+                추천 제품
+              </strong>
+              <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
                 {recsFromJson.map((rec, idx) => (
                   <li key={idx}>
-                    {rec.product_name} ({rec.category}) - 유사도: {(rec.similarity * 100).toFixed(2)}%
+                    <span className="font-medium">{rec.product_name}</span> ({rec.category}) - 유사도:{" "}
+                    {(rec.similarity * 100).toFixed(2)}%
                   </li>
                 ))}
               </ul>
