@@ -8,8 +8,8 @@ export default function MapPage() {
     script.onload = () => {
       const mapContainer = document.getElementById("map");
       const mapOption = {
-        center: new window.kakao.maps.LatLng(37.5665, 126.9780), // 초기 중심
-        level: 5, // 적당히 넓게 보기
+        center: new window.kakao.maps.LatLng(37.5665, 126.9780),
+        level: 3,
       };
 
       const map = new window.kakao.maps.Map(mapContainer, mapOption);
@@ -20,21 +20,21 @@ export default function MapPage() {
           const lon = position.coords.longitude;
           const locPosition = new window.kakao.maps.LatLng(lat, lon);
 
-          // ✅ 내 위치 기본 마커 (커스텀 X)
+          // 내 위치로 지도 이동
+          map.setCenter(locPosition);
+
+          // 내 위치 마커 (기본 모양)
           new window.kakao.maps.Marker({
             map: map,
             position: locPosition,
             title: "내 위치",
           });
 
-          // ✅ 내 위치 중심으로 지도 이동
-          map.setCenter(locPosition);
-
-          // ✅ 병원 검색
+          // 주변 피부과 검색
           const ps = new window.kakao.maps.services.Places();
           const options = {
             location: locPosition,
-            radius: 5000, // 🔥 반경 5km
+            radius: 5000, // ✅ 반경 5km로 설정
             sort: window.kakao.maps.services.SortBy.DISTANCE,
           };
 
@@ -43,15 +43,17 @@ export default function MapPage() {
               for (let i = 0; i < data.length; i++) {
                 const place = data[i];
 
-                // ✅ 병원 마커 (붉은 십자가 아이콘 사용)
+                // ✅ 병원 마커 (카카오 기본 병원 마커)
+                const markerImage = new window.kakao.maps.MarkerImage(
+                  "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerHospital.png",
+                  new window.kakao.maps.Size(24, 35)
+                );
+
                 const marker = new window.kakao.maps.Marker({
                   map: map,
                   position: new window.kakao.maps.LatLng(place.y, place.x),
                   title: place.place_name,
-                  image: new window.kakao.maps.MarkerImage(
-                    "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png", // 붉은 십자가
-                    new window.kakao.maps.Size(32, 32)
-                  ),
+                  image: markerImage,
                 });
 
                 const infowindow = new window.kakao.maps.InfoWindow({
