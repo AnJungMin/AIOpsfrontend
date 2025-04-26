@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom"; // ✅ 추가
 
 export default function ResultCard({ item, recommendationsJson }) {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate(); // ✅ 추가
 
   const severityStyle = {
     정상: "bg-green-100 text-green-800",
@@ -66,14 +68,13 @@ export default function ResultCard({ item, recommendationsJson }) {
             </p>
           )}
 
-          {/* 경증 / 중등증일 때 추천 제품 보여주기 */}
+          {/* 경증 / 중등증일 때 추천 제품 */}
           {(item.severity === "경증" || item.severity === "중등증") && recsFromJson.length > 0 && (
             <div className="space-y-2">
               <strong className="block font-semibold text-gray-800 dark:text-gray-200">
                 추천 제품
               </strong>
 
-              {/* 추천 제품 리스트 */}
               <div className="grid gap-3">
                 {recsFromJson.map((rec, idx) => {
                   const similarity = (rec.similarity * 100).toFixed(2);
@@ -87,7 +88,6 @@ export default function ResultCard({ item, recommendationsJson }) {
                       <div className="font-medium text-gray-800 dark:text-white">{rec.product_name}</div>
                       <div className="text-xs text-gray-500 dark:text-gray-300">{rec.category}</div>
 
-                      {/* 유사도 Progress Bar */}
                       <div className="w-full bg-gray-200 rounded-full h-2 my-2">
                         <div
                           className={`h-2 ${similarityBarColor} rounded-full`}
@@ -107,9 +107,22 @@ export default function ResultCard({ item, recommendationsJson }) {
 
           {/* 중증일 때 */}
           {item.severity === "중증" && (
-            <p className="text-red-600 font-semibold">
-              {item.hospital_recommendation || "증상이 심각할 수 있어 피부과 방문을 권장합니다."}
-            </p>
+            <div className="space-y-3">
+              <p className="text-red-600 font-semibold">
+                {item.hospital_recommendation || "증상이 심각할 수 있어 피부과 방문을 권장합니다."}
+              </p>
+
+              {/* 지도 보기 버튼 */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation(); // 카드 전체 클릭 방지
+                  navigate("/map");
+                }}
+                className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg transition"
+              >
+                주변 피부과 지도 보기
+              </button>
+            </div>
           )}
         </div>
       )}

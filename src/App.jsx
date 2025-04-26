@@ -3,7 +3,7 @@ import Header from "./components/Header";
 import Home from "./pages/Home";
 import Result from "./pages/Result";
 import About from "./pages/About";
-
+import MapPage from "./pages/MapPage"; // ✅ 지도 페이지 추가!
 
 function App() {
   return (
@@ -14,6 +14,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/result" element={<Result />} />
           <Route path="/about" element={<About />} />
+          <Route path="/map" element={<MapPage />} /> {/* ✅ 지도 경로 추가 */}
         </Routes>
       </main>
       <footer className="text-center text-sm text-gray-400 py-6">
