@@ -10,7 +10,7 @@ export default function ResultCard({ item, recommendationsJson }) {
     중증: "bg-red-100 text-red-800",
   };
 
-  const barColor = {
+  const severityBarColor = {
     정상: "bg-green-400",
     경증: "bg-yellow-400",
     중등증: "bg-orange-400",
@@ -35,50 +35,77 @@ export default function ResultCard({ item, recommendationsJson }) {
       onClick={handleClick}
       className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl p-5 mb-5 shadow hover:shadow-md transition cursor-pointer"
     >
+      {/* 제목 + 상태 배지 */}
       <div className="flex justify-between items-center mb-3">
         <h4 className="text-lg font-bold text-gray-900 dark:text-white">{cleanKey}</h4>
-        <span
-          className={`text-sm px-3 py-1 rounded-full font-medium ${severityStyle[item.severity]}`}
-        >
+        <span className={`text-sm px-3 py-1 rounded-full font-medium ${severityStyle[item.severity]}`}>
           {item.severity}
         </span>
       </div>
 
+      {/* 신뢰도 Progress Bar */}
       <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-2 overflow-hidden">
         <div
-          className={`h-2 ${barColor[item.severity]}`}
+          className={`h-2 ${severityBarColor[item.severity]}`}
           style={{ width: `${confidencePercent}%` }}
         />
       </div>
 
+      {/* 신뢰도 퍼센트 */}
       <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
         신뢰도: {confidencePercent}%
       </p>
 
+      {/* 클릭하면 열리는 상세 영역 */}
       {open && (
-        <div className="text-sm mt-3 space-y-2">
+        <div className="text-sm mt-4 space-y-4">
+          {/* 정상일 때 */}
           {item.severity === "정상" && (
             <p className="text-green-600">
               {item.comment || "정상 범위입니다. 두피 상태가 양호합니다."}
             </p>
           )}
 
+          {/* 경증 / 중등증일 때 추천 제품 보여주기 */}
           {(item.severity === "경증" || item.severity === "중등증") && recsFromJson.length > 0 && (
-            <div>
-              <strong className="block font-semibold text-gray-800 dark:text-gray-200 mb-1">
+            <div className="space-y-2">
+              <strong className="block font-semibold text-gray-800 dark:text-gray-200">
                 추천 제품
               </strong>
-              <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
-                {recsFromJson.map((rec, idx) => (
-                  <li key={idx}>
-                    <span className="font-medium">{rec.product_name}</span> ({rec.category}) - 유사도:{" "}
-                    {(rec.similarity * 100).toFixed(2)}%
-                  </li>
-                ))}
-              </ul>
+
+              {/* 추천 제품 리스트 */}
+              <div className="grid gap-3">
+                {recsFromJson.map((rec, idx) => {
+                  const similarity = (rec.similarity * 100).toFixed(2);
+                  const similarityBarColor = similarity >= 90 ? "bg-green-400" : "bg-blue-400";
+
+                  return (
+                    <div
+                      key={idx}
+                      className="p-4 border rounded-xl shadow-sm hover:shadow-md bg-gray-50 dark:bg-gray-700 transition"
+                    >
+                      <div className="font-medium text-gray-800 dark:text-white">{rec.product_name}</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-300">{rec.category}</div>
+
+                      {/* 유사도 Progress Bar */}
+                      <div className="w-full bg-gray-200 rounded-full h-2 my-2">
+                        <div
+                          className={`h-2 ${similarityBarColor} rounded-full`}
+                          style={{ width: `${similarity}%` }}
+                        />
+                      </div>
+
+                      <div className="text-xs text-gray-400">
+                        유사도 {similarity}%
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
 
+          {/* 중증일 때 */}
           {item.severity === "중증" && (
             <p className="text-red-600 font-semibold">
               {item.hospital_recommendation || "증상이 심각할 수 있어 피부과 방문을 권장합니다."}
