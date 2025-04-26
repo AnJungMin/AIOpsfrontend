@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 
 export default function MapPage() {
-  const [places, setPlaces] = useState([]);
   const [map, setMap] = useState(null);
+  const [markers, setMarkers] = useState([]);
+  const [places, setPlaces] = useState([]);
+  const [selectedMarkerIndex, setSelectedMarkerIndex] = useState(null);
 
   useEffect(() => {
     const script = document.createElement("script");
@@ -12,11 +14,11 @@ export default function MapPage() {
       const mapContainer = document.getElementById("map");
       const mapOption = {
         center: new window.kakao.maps.LatLng(37.5665, 126.9780),
-        level: 4,
+        level: 5,
       };
 
-      const newMap = new window.kakao.maps.Map(mapContainer, mapOption);
-      setMap(newMap);
+      const kakaoMap = new window.kakao.maps.Map(mapContainer, mapOption);
+      setMap(kakaoMap);
 
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition((position) => {
@@ -24,38 +26,29 @@ export default function MapPage() {
           const lon = position.coords.longitude;
           const locPosition = new window.kakao.maps.LatLng(lat, lon);
 
-          // 내 위치 기본 파란 마커
+          // 내 위치 마커
           new window.kakao.maps.Marker({
-            map: newMap,
+            map: kakaoMap,
             position: locPosition,
-            title: "내 위치",
           });
 
-          newMap.setCenter(locPosition);
+          kakaoMap.setCenter(locPosition);
 
-          // 주변 피부과 검색
           const ps = new window.kakao.maps.services.Places();
           ps.keywordSearch("피부과", (data, status) => {
             if (status === window.kakao.maps.services.Status.OK) {
-              const sorted = data
-                .map((place) => ({
-                  ...place,
-                  distance: getDistance(lat, lon, place.y, place.x),
-                }))
-                .sort((a, b) => a.distance - b.distance)
-                .slice(0, 5); // 가까운 5개만
+              const limitedData = data.slice(0, 5); // 5개만 사용
+              setPlaces(limitedData);
 
-              setPlaces(sorted);
-
-              sorted.forEach((place) => {
-                const marker = new window.kakao.maps.Marker({
-                  map: newMap,
+              const createdMarkers = limitedData.map((place) => {
+                return new window.kakao.maps.Marker({
+                  map: kakaoMap,
                   position: new window.kakao.maps.LatLng(place.y, place.x),
                 });
-                place.marker = marker; // 나중에 클릭할 때 접근하려고 저장
               });
+              setMarkers(createdMarkers);
             }
-          }, { location: locPosition, radius: 5000 });
+          }, { location: locPosition, radius: 5000, sort: window.kakao.maps.services.SortBy.DISTANCE });
         });
       }
     };
@@ -63,49 +56,40 @@ export default function MapPage() {
     document.head.appendChild(script);
   }, []);
 
-  const getDistance = (lat1, lon1, lat2, lon2) => {
-    const R = 6371e3; // meters
-    const φ1 = lat1 * Math.PI/180;
-    const φ2 = lat2 * Math.PI/180;
-    const Δφ = (lat2-lat1) * Math.PI/180;
-    const Δλ = (lon2-lon1) * Math.PI/180;
+  const handleListClick = (idx) => {
+    if (!map) return;
 
-    const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-              Math.cos(φ1) * Math.cos(φ2) *
-              Math.sin(Δλ/2) * Math.sin(Δλ/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    markers.forEach((marker, i) => {
+      const imageSrc = i === idx
+        ? "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png" // 선택시 빨간 마커
+        : "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_blue.png"; // 기본 파란 마커
 
-    const d = R * c;
-    return d;
-  };
+      const imageSize = new window.kakao.maps.Size(40, 40);
+      const markerImage = new window.kakao.maps.MarkerImage(imageSrc, imageSize);
+      marker.setImage(markerImage);
+    });
 
-  const handleMove = (place) => {
-    if (map && place.marker) {
-      map.panTo(new window.kakao.maps.LatLng(place.y, place.x));
-      place.marker.setAnimation(window.kakao.maps.Animation.BOUNCE);
-      setTimeout(() => place.marker.setAnimation(null), 1400);
-    }
+    map.setCenter(markers[idx].getPosition());
+    setSelectedMarkerIndex(idx);
   };
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">주변 피부과 추천</h2>
-      <div id="map" className="w-full h-[400px] rounded-xl shadow mb-6" />
+    <div className="p-4 space-y-6">
+      <h2 className="text-xl font-bold">주변 피부과 추천</h2>
 
-      {/* 추천 병원 리스트 */}
-      <div className="space-y-4">
+      {/* 지도 */}
+      <div id="map" className="w-full h-[400px] rounded-xl shadow" />
+
+      {/* 리스트 */}
+      <div className="space-y-2">
         {places.map((place, idx) => (
           <div
             key={idx}
-            className="p-4 border rounded-xl shadow hover:shadow-md cursor-pointer bg-white dark:bg-gray-800"
-            onClick={() => handleMove(place)}
+            onClick={() => handleListClick(idx)}
+            className={`p-3 rounded-lg cursor-pointer border ${selectedMarkerIndex === idx ? 'bg-rose-100 border-rose-400' : 'bg-white dark:bg-gray-800'}`}
           >
-            <div className="font-semibold text-gray-900 dark:text-white">
-              {place.place_name}
-            </div>
-            <div className="text-sm text-gray-500 dark:text-gray-400">
-              {place.road_address_name || place.address_name}
-            </div>
+            <p className="font-semibold">{place.place_name}</p>
+            <p className="text-sm text-gray-500">{place.address_name}</p>
           </div>
         ))}
       </div>
