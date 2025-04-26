@@ -21,7 +21,7 @@ export default function MapPage() {
             const lon = position.coords.longitude;
             const locPosition = new window.kakao.maps.LatLng(lat, lon);
 
-            // ✅ 내 위치 기본 파란색 마커
+            // ✅ 내 위치 기본 마커
             new window.kakao.maps.Marker({
               map: map,
               position: locPosition,
@@ -40,34 +40,31 @@ export default function MapPage() {
 
             ps.keywordSearch("피부과", (data, status) => {
               if (status === window.kakao.maps.services.Status.OK) {
-                for (let i = 0; i < data.length; i++) {
-                  const place = data[i];
+                data.forEach((place) => {
+                  const markerPosition = new window.kakao.maps.LatLng(place.y, place.x);
 
-                  // ✅ 기본 붉은색 핀 마커 사용
+                  // 마커 생성
                   const marker = new window.kakao.maps.Marker({
-                    map: map,
-                    position: new window.kakao.maps.LatLng(place.y, place.x),
+                    map,
+                    position: markerPosition,
                     title: place.place_name,
                   });
 
-                  // ✅ 클릭 시 병원 이름 띄우기
+                  // 인포윈도우 생성
                   const infowindow = new window.kakao.maps.InfoWindow({
-                    content: `
-                      <div style="padding:5px; font-size:14px;">
-                        🏥 ${place.place_name}
-                      </div>
-                    `,
+                    content: `<div style="padding:5px;font-size:14px;">🏥 ${place.place_name}</div>`,
                   });
 
+                  // 마커에 클릭 이벤트 등록
                   window.kakao.maps.event.addListener(marker, "click", () => {
                     infowindow.open(map, marker);
                   });
-                }
+                });
               }
             }, options);
+          }, (error) => {
+            alert("위치 정보를 가져올 수 없습니다.");
           });
-        } else {
-          alert("위치 정보를 사용할 수 없습니다.");
         }
       });
     };
