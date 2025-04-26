@@ -70,7 +70,7 @@ export default function MapPage() {
       selectedMarker.setImage(null); // 기존 강조 해제
     }
 
-    const imageSrc = "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_red.png"; // 빨간 핀
+    const imageSrc = "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png"; // 빨간 핀
     const imageSize = new window.kakao.maps.Size(40, 40);
     const markerImage = new window.kakao.maps.MarkerImage(imageSrc, imageSize);
     marker.setImage(markerImage);
