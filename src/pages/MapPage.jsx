@@ -3,7 +3,7 @@ import { useEffect } from "react";
 export default function MapPage() {
   useEffect(() => {
     const script = document.createElement("script");
-    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=6a6492f8fb8e1c114d50540c547a6b65&libraries=services`; // ✅ 네 JavaScript 키 입력 완료
+    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=6a6492f8fb8e1c114d50540c547a6b65&libraries=services`; // ✅ https 명시
     script.async = true;
     script.onload = () => {
       const mapContainer = document.getElementById("map");
