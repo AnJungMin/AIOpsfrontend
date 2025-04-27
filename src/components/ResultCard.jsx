@@ -5,17 +5,25 @@ export default function ResultCard({ item, recommendationsJson }) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
+  // ✅ 명칭 변경 완료
+  const severityMapping = {
+    정상: "양호",
+    경증: "경증",
+    중등증: "중등도",
+    중증: "중증",
+  };
+
   const severityStyle = {
-    정상: "bg-green-100 text-green-800",
+    양호: "bg-green-100 text-green-800",
     경증: "bg-yellow-100 text-yellow-800",
-    중등증: "bg-orange-100 text-orange-800",
+    중등도: "bg-orange-100 text-orange-800",
     중증: "bg-red-100 text-red-800",
   };
 
   const severityBarColor = {
-    정상: "bg-green-400",
+    양호: "bg-green-400",
     경증: "bg-yellow-400",
-    중등증: "bg-orange-400",
+    중등도: "bg-orange-400",
     중증: "bg-red-400",
   };
 
@@ -29,18 +37,18 @@ export default function ResultCard({ item, recommendationsJson }) {
     typeof rawConfidence === "string" ? rawConfidence.replace("%", "") : rawConfidence
   );
 
-  const severity = item.severity || "정상";
+  const originalSeverity = item.severity || "정상";
+  const severity = severityMapping[originalSeverity] || "양호";
 
-  // ✅ 기본값 세팅
   const baseFill = {
-    정상: 0,
+    양호: 0,
     경증: 25,
-    중등증: 50,
+    중등도: 50,
     중증: 75,
   }[severity] || 0;
 
   const remainingFill = 25;
-  const confidenceRate = Math.min(1, numericConfidence / 100); // 0~1 사이 비율
+  const confidenceRate = Math.min(1, numericConfidence / 100);
   const additionalFill = remainingFill * confidenceRate;
 
   const totalFillPercent = Math.min(100, baseFill + additionalFill);
@@ -58,7 +66,7 @@ export default function ResultCard({ item, recommendationsJson }) {
         </span>
       </div>
 
-      {/* 신뢰도 Progress Bar */}
+      {/* ✅ 신뢰도 텍스트 삭제하고 Progress Bar만 남김 */}
       <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-2 overflow-hidden">
         <div
           className={`h-2 ${severityBarColor[severity]}`}
@@ -66,21 +74,16 @@ export default function ResultCard({ item, recommendationsJson }) {
         />
       </div>
 
-      {/* 신뢰도 퍼센트 */}
-      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-        신뢰도: {numericConfidence.toFixed(2)}%
-      </p>
-
       {/* 클릭하면 열리는 상세 영역 */}
       {open && (
         <div className="text-sm mt-4 space-y-4">
-          {severity === "정상" && (
+          {severity === "양호" && (
             <p className="text-green-600">
               {item.comment || "정상 범위입니다. 두피 상태가 양호합니다."}
             </p>
           )}
 
-          {(severity === "경증" || severity === "중등증") && recsFromJson.length > 0 && (
+          {(severity === "경증" || severity === "중등도") && recsFromJson.length > 0 && (
             <div className="space-y-2">
               <strong className="block font-semibold text-gray-800 dark:text-gray-200">
                 추천 제품
