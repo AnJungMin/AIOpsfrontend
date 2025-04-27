@@ -28,31 +28,22 @@ export default function ResultCard({ item, recommendationsJson }) {
   const numericConfidence = parseFloat(
     typeof rawConfidence === "string" ? rawConfidence.replace("%", "") : rawConfidence
   );
-  const confidencePercent = isNaN(numericConfidence)
-    ? 0
-    : Math.min(100, numericConfidence.toFixed(2));
 
-  // ✅ 4구간 분할 계산
-  let baseWidth = 0;
-  switch (item.severity) {
-    case "정상":
-      baseWidth = 25;
-      break;
-    case "경증":
-      baseWidth = 50;
-      break;
-    case "중등증":
-      baseWidth = 75;
-      break;
-    case "중증":
-      baseWidth = 100;
-      break;
-    default:
-      baseWidth = 0;
-  }
+  const severity = item.severity || "정상";
 
-  // ✅ 추가로 신뢰도 비율만큼 늘리기 (ex: baseWidth + (confidence% / 4))
-  const adjustedWidth = Math.min(baseWidth, 100) * (confidencePercent / 100);
+  // ✅ 기본값 세팅
+  const baseFill = {
+    정상: 0,
+    경증: 25,
+    중등증: 50,
+    중증: 75,
+  }[severity] || 0;
+
+  const remainingFill = 25;
+  const confidenceRate = Math.min(1, numericConfidence / 100); // 0~1 사이 비율
+  const additionalFill = remainingFill * confidenceRate;
+
+  const totalFillPercent = Math.min(100, baseFill + additionalFill);
 
   return (
     <div
@@ -62,39 +53,38 @@ export default function ResultCard({ item, recommendationsJson }) {
       {/* 제목 + 상태 배지 */}
       <div className="flex justify-between items-center mb-3">
         <h4 className="text-lg font-bold text-gray-900 dark:text-white">{cleanKey}</h4>
-        <span className={`text-sm px-3 py-1 rounded-full font-medium ${severityStyle[item.severity]}`}>
-          {item.severity}
+        <span className={`text-sm px-3 py-1 rounded-full font-medium ${severityStyle[severity]}`}>
+          {severity}
         </span>
       </div>
 
       {/* 신뢰도 Progress Bar */}
       <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-2 overflow-hidden">
         <div
-          className={`h-2 ${severityBarColor[item.severity]}`}
-          style={{ width: `${adjustedWidth}%` }}
+          className={`h-2 ${severityBarColor[severity]}`}
+          style={{ width: `${totalFillPercent}%` }}
         />
       </div>
 
       {/* 신뢰도 퍼센트 */}
       <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-        신뢰도: {confidencePercent}%
+        신뢰도: {numericConfidence.toFixed(2)}%
       </p>
 
       {/* 클릭하면 열리는 상세 영역 */}
       {open && (
         <div className="text-sm mt-4 space-y-4">
-          {item.severity === "정상" && (
+          {severity === "정상" && (
             <p className="text-green-600">
               {item.comment || "정상 범위입니다. 두피 상태가 양호합니다."}
             </p>
           )}
 
-          {(item.severity === "경증" || item.severity === "중등증") && recsFromJson.length > 0 && (
+          {(severity === "경증" || severity === "중등증") && recsFromJson.length > 0 && (
             <div className="space-y-2">
               <strong className="block font-semibold text-gray-800 dark:text-gray-200">
                 추천 제품
               </strong>
-
               <div className="grid gap-3">
                 {recsFromJson.map((rec, idx) => {
                   const similarity = (rec.similarity * 100).toFixed(2);
@@ -125,12 +115,11 @@ export default function ResultCard({ item, recommendationsJson }) {
             </div>
           )}
 
-          {item.severity === "중증" && (
+          {severity === "중증" && (
             <div className="space-y-3">
               <p className="text-red-600 font-semibold">
                 {item.hospital_recommendation || "증상이 심각할 수 있어 피부과 방문을 권장합니다."}
               </p>
-
               <button
                 onClick={(e) => {
                   e.stopPropagation();
