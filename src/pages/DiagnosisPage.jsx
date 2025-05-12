@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Webcam from "react-webcam";
 
@@ -9,7 +9,7 @@ export default function DiagnosisPage() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const webcamRef = useCamera ? useState(null)[0] : null;
+  const webcamRef = useRef(null);
 
   const handleCapture = () => {
     const imageSrc = webcamRef.current.getScreenshot();
@@ -41,7 +41,7 @@ export default function DiagnosisPage() {
 
   const handleUpload = async () => {
     if (!image) {
-      alert("이미지를 선택해주세요!");
+      alert("이미지를 선택하거나 촬영해주세요.");
       return;
     }
 
@@ -75,8 +75,8 @@ export default function DiagnosisPage() {
           사진을 업로드하거나, 카메라로 촬영해 주세요!
         </p>
 
-        {/* 모드 선택 */}
-        <div className="flex justify-center gap-4 mb-6">
+        {/* 모드 선택 버튼 */}
+        <div className="flex justify-center gap-4 mb-4">
           <button
             onClick={() => setUseCamera(false)}
             className={`px-4 py-2 rounded-lg font-semibold transition ${
@@ -95,7 +95,7 @@ export default function DiagnosisPage() {
           </button>
         </div>
 
-        {/* 업로드 or 카메라 */}
+        {/* 업로드 OR 카메라 */}
         {!useCamera ? (
           <>
             <label
