@@ -1,10 +1,10 @@
 import { Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
-import Home from "./pages/DiagnosisPage";
+import DiagnosisPage from "./pages/DiagnosisPage"; // 이름 변경
+import Home from "./pages/Home"; // LandingPage
 import Result from "./pages/Result";
-import Home from "./pages/Home";
 import About from "./pages/About";
-import MapPage from "./pages/MapPage"; // ✅ 지도 페이지 추가!
+import MapPage from "./pages/MapPage";
 
 function App() {
   return (
@@ -12,10 +12,11 @@ function App() {
       <Header />
       <main className="max-w-3xl mx-auto px-6 py-8">
         <Routes>
-          <Route path="/home" element={<Home />} />
+          <Route path="/" element={<Home />} /> {/* ✅ 메인 페이지 */}
+          <Route path="/diagnosis" element={<DiagnosisPage />} /> {/* ✅ 진단 페이지 */}
           <Route path="/result" element={<Result />} />
           <Route path="/about" element={<About />} />
-          <Route path="/map" element={<MapPage />} /> {/* ✅ 지도 경로 추가 */}
+          <Route path="/map" element={<MapPage />} />
         </Routes>
       </main>
       <footer className="text-center text-sm text-gray-400 py-6">
