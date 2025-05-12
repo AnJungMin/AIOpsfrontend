@@ -1,76 +1,42 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function Home() {
-  const [image, setImage] = useState(null);
-  const [loading, setLoading] = useState(false);
+export default function LandingPage() {
   const navigate = useNavigate();
 
-  const handleFileChange = (e) => {
-    setImage(e.target.files[0]);
-  };
-
-  const handleUpload = async () => {
-    if (!image) {
-      alert("이미지를 선택해주세요!");
-      return;
-    }
-
-    setLoading(true);
-    const formData = new FormData();
-    formData.append("file", image);
-
-    try {
-      const res = await fetch("https://test2-o3lj.onrender.com/api/predict", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
-      localStorage.setItem("scalpcare_result", JSON.stringify(data.predictions));
-      navigate("/result");
-    } catch (err) {
-      alert("예측 요청에 실패했습니다.");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center bg-gray-50 dark:bg-gradient-to-b dark:from-[#0f172a] dark:to-[#1e293b] text-gray-900 dark:text-white p-6">
-      <div className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-10 w-full max-w-md">
-        <h1 className="text-2xl md:text-3xl font-extrabold text-center mb-6">
-          두피 질환 AI 진단
-        </h1>
-        <p className="text-center text-gray-500 dark:text-gray-400 mb-8">
-          두피 사진을 업로드하면 AI가 자동으로 질환을 분석하고 맞춤형 추천을 드려요!
-        </p>
+    <div className="text-center py-20 bg-slate-50 dark:bg-gray-900">
+      <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-4">
+        AI가 분석하는 맞춤형 두피 케어
+      </h1>
+      <p className="text-gray-600 dark:text-gray-300 mb-6">
+        단 1분만에 당신의 두피 상태를 분석하고 맞춤 솔루션을 제공합니다
+      </p>
+      <button
+        onClick={() => navigate("/diagnosis")}
+        className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition"
+      >
+        지금 진단하기
+      </button>
 
-        <div className="flex flex-col items-center space-y-4">
-          <label htmlFor="file-upload" className="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg cursor-pointer transition">
-            파일 선택
-            <input id="file-upload" type="file" onChange={handleFileChange} className="hidden" accept="image/*" />
-          </label>
-
-          <button
-            onClick={handleUpload}
-            disabled={loading}
-            className="px-6 py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg transition disabled:opacity-50"
-          >
-            {loading ? "진단 중..." : "진단 시작"}
-          </button>
+      {/* 진단 프로세스 */}
+      <section className="mt-16">
+        <h2 className="text-2xl font-bold mb-8 text-gray-800 dark:text-white">진단 프로세스</h2>
+        <div className="flex justify-center gap-8 flex-wrap">
+          <Step number="01" title="두피 사진 업로드" desc="스마트폰으로 촬영한 두피 사진을 업로드하세요" />
+          <Step number="02" title="AI 분석" desc="첨단 AI가 두피 상태를 정밀 분석합니다" />
+          <Step number="03" title="맞춤 솔루션" desc="분석 결과에 따른 제품을 추천받으세요" />
         </div>
+      </section>
+    </div>
+  );
+}
 
-        {loading && (
-          <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-6">
-            AI가 열심히 분석하고 있어요. 잠시만 기다려주세요...
-          </p>
-        )}
-      </div>
-
-      <footer className="mt-10 text-xs text-gray-400">
-        © 2025 ScalpCare. All rights reserved.
-      </footer>
+function Step({ number, title, desc }) {
+  return (
+    <div className="bg-white dark:bg-gray-800 shadow-md rounded-xl p-6 w-[250px] text-center">
+      <p className="text-blue-600 font-bold text-lg">{number}</p>
+      <h3 className="text-xl font-semibold mt-2 text-gray-900 dark:text-white">{title}</h3>
+      <p className="text-sm text-gray-500 dark:text-gray-300 mt-1">{desc}</p>
     </div>
   );
 }

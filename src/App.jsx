@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import Header from "./components/Header";
 import Home from "./pages/Home";
 import Result from "./pages/Result";
+import LandingPage from "./pages/LandingPage";
 import About from "./pages/About";
 import MapPage from "./pages/MapPage"; // ✅ 지도 페이지 추가!
 
