@@ -1,3 +1,4 @@
+// CameraUploadForm.jsx
 import { useRef, useState } from "react";
 import Webcam from "react-webcam";
 
@@ -11,7 +12,6 @@ export default function CameraUploadForm({ onFileChange, onUpload }) {
     if (imageSrc) {
       const byteString = atob(imageSrc.split(",")[1]);
       const mimeString = imageSrc.split(",")[0].split(":")[1].split(";")[0];
-
       const ab = new ArrayBuffer(byteString.length);
       const ia = new Uint8Array(ab);
       for (let i = 0; i < byteString.length; i++) {
@@ -22,6 +22,7 @@ export default function CameraUploadForm({ onFileChange, onUpload }) {
 
       setImagePreview(imageSrc);
       onFileChange({ target: { files: [file] } });
+      onUpload(); // ✅ 자동 업로드
     }
   };
 
@@ -30,30 +31,38 @@ export default function CameraUploadForm({ onFileChange, onUpload }) {
     if (file) {
       setImagePreview(URL.createObjectURL(file));
       onFileChange(e);
+      onUpload(); // ✅ 자동 업로드
     }
   };
 
   return (
     <div className="flex flex-col items-center gap-6">
-      <h2 className="text-2xl font-bold text-center">두피 사진을 업로드하거나 촬영하세요</h2>
+      <h2 className="text-2xl font-bold text-center">두피 질환 AI 진단</h2>
+      <p className="text-center text-gray-500 dark:text-gray-400">
+        사진을 업로드하거나, 카메라로 촬영해 주세요!
+      </p>
 
-      {/* 버튼 선택 */}
+      {/* 모드 선택 */}
       <div className="flex gap-4">
         <button
           onClick={() => setUseCamera(false)}
-          className={`px-4 py-2 rounded-lg font-semibold transition ${!useCamera ? "bg-blue-500 text-white" : "bg-gray-200 dark:bg-gray-700"}`}
+          className={`px-4 py-2 rounded-lg font-semibold transition ${
+            !useCamera ? "bg-blue-500 text-white" : "bg-gray-200 dark:bg-gray-700"
+          }`}
         >
           파일 업로드
         </button>
         <button
           onClick={() => setUseCamera(true)}
-          className={`px-4 py-2 rounded-lg font-semibold transition ${useCamera ? "bg-blue-500 text-white" : "bg-gray-200 dark:bg-gray-700"}`}
+          className={`px-4 py-2 rounded-lg font-semibold transition ${
+            useCamera ? "bg-blue-500 text-white" : "bg-gray-200 dark:bg-gray-700"
+          }`}
         >
           카메라 촬영
         </button>
       </div>
 
-      {/* 파일 업로드 */}
+      {/* 파일 선택 */}
       {!useCamera && (
         <input
           type="file"
@@ -63,7 +72,7 @@ export default function CameraUploadForm({ onFileChange, onUpload }) {
         />
       )}
 
-      {/* 카메라 촬영 */}
+      {/* 카메라 */}
       {useCamera && (
         <div className="flex flex-col items-center gap-2">
           <Webcam
@@ -90,14 +99,6 @@ export default function CameraUploadForm({ onFileChange, onUpload }) {
           className="mt-4 rounded-xl max-h-64 shadow"
         />
       )}
-
-      {/* 진단 시작 */}
-      <button
-        onClick={onUpload}
-        className="mt-6 px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700"
-      >
-        진단 시작
-      </button>
     </div>
   );
 }
