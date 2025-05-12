@@ -12,7 +12,7 @@ function App() {
       <Header />
       <main className="max-w-3xl mx-auto px-6 py-8">
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/home" element={<Home />} />
           <Route path="/result" element={<Result />} />
           <Route path="/about" element={<About />} />
           <Route path="/map" element={<MapPage />} /> {/* ✅ 지도 경로 추가 */}
