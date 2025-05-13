@@ -1,14 +1,15 @@
 // pages/MapPage.jsx
 import { useEffect, useState } from "react";
+import HospitalModal from "../components/HospitalModal";
 
 export default function MapPage() {
   const [places, setPlaces] = useState([]);
   const [map, setMap] = useState(null);
   const [markers, setMarkers] = useState([]);
   const [selectedMarker, setSelectedMarker] = useState(null);
+  const [selectedHospital, setSelectedHospital] = useState(null); // ✅ 병원 선택 상태 추가
 
   useEffect(() => {
-    // 이미 로딩된 경우 중복 방지
     if (window.kakao && window.kakao.maps) {
       initKakaoMap();
     } else {
@@ -52,25 +53,29 @@ export default function MapPage() {
         kakaoMap.setCenter(locPosition);
 
         const ps = new kakao.maps.services.Places();
-        ps.keywordSearch("피부과", (data, status) => {
-          if (status === kakao.maps.services.Status.OK) {
-            const newMarkers = data.slice(0, 5).map((place) => {
-              const marker = new kakao.maps.Marker({
-                map: kakaoMap,
-                position: new kakao.maps.LatLng(place.y, place.x),
-                title: place.place_name,
+        ps.keywordSearch(
+          "피부과",
+          (data, status) => {
+            if (status === kakao.maps.services.Status.OK) {
+              const newMarkers = data.slice(0, 5).map((place) => {
+                const marker = new kakao.maps.Marker({
+                  map: kakaoMap,
+                  position: new kakao.maps.LatLng(place.y, place.x),
+                  title: place.place_name,
+                });
+                return marker;
               });
-              return marker;
-            });
 
-            setPlaces(data.slice(0, 5));
-            setMarkers(newMarkers);
+              setPlaces(data.slice(0, 5));
+              setMarkers(newMarkers);
+            }
+          },
+          {
+            location: locPosition,
+            radius: 5000,
+            sort: kakao.maps.services.SortBy.DISTANCE,
           }
-        }, {
-          location: locPosition,
-          radius: 5000,
-          sort: kakao.maps.services.SortBy.DISTANCE,
-        });
+        );
       });
     }
   };
@@ -92,6 +97,7 @@ export default function MapPage() {
     marker.setImage(markerImage);
 
     setSelectedMarker(marker);
+    setSelectedHospital(places[idx]); // ✅ 병원 정보 저장
   };
 
   return (
@@ -110,6 +116,9 @@ export default function MapPage() {
           </div>
         ))}
       </div>
+
+      {/* ✅ 병원 예약 모달 */}
+      <HospitalModal hospital={selectedHospital} onClose={() => setSelectedHospital(null)} />
     </div>
   );
 }
