@@ -7,70 +7,91 @@ export default function MapPage() {
   const [selectedMarker, setSelectedMarker] = useState(null);
 
   useEffect(() => {
-    const script = document.createElement("script");
-    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=6a6492f8fb8e1c114d50540c547a6b65&libraries=services`;
-    script.async = true;
-    script.onload = () => {
-      const mapContainer = document.getElementById("map");
-      const mapOption = {
-        center: new window.kakao.maps.LatLng(37.5665, 126.9780),
-        level: 5,
+    // window.kakao가 이미 있으면 중복 로딩 방지
+    if (window.kakao && window.kakao.maps) {
+      initializeMap();
+    } else {
+      const script = document.createElement("script");
+      script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=6a6492f8fb8e1c114d50540c547a6b65&autoload=false&libraries=services`;
+      script.async = true;
+      script.onload = () => {
+        window.kakao.maps.load(() => {
+          initializeMap();
+        });
       };
-      const kakaoMap = new window.kakao.maps.Map(mapContainer, mapOption);
-      setMap(kakaoMap);
+      document.head.appendChild(script);
+    }
+  }, []);
 
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition((position) => {
-          const lat = position.coords.latitude;
-          const lon = position.coords.longitude;
-          const locPosition = new window.kakao.maps.LatLng(lat, lon);
+  const initializeMap = () => {
+    const container = document.getElementById("map");
+    if (!container) return;
 
-          new window.kakao.maps.Marker({
-            map: kakaoMap,
-            position: locPosition,
-            title: "내 위치",
-          });
+    const kakao = window.kakao;
+    const options = {
+      center: new kakao.maps.LatLng(37.5665, 126.9780),
+      level: 5,
+    };
 
-          kakaoMap.setCenter(locPosition);
+    const kakaoMap = new kakao.maps.Map(container, options);
+    setMap(kakaoMap);
 
-          const ps = new window.kakao.maps.services.Places();
-          ps.keywordSearch("피부과", (data, status) => {
-            if (status === window.kakao.maps.services.Status.OK) {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        const locPosition = new kakao.maps.LatLng(lat, lon);
+
+        new kakao.maps.Marker({
+          map: kakaoMap,
+          position: locPosition,
+          title: "내 위치",
+        });
+
+        kakaoMap.setCenter(locPosition);
+
+        const ps = new kakao.maps.services.Places();
+        ps.keywordSearch(
+          "피부과",
+          (data, status) => {
+            if (status === kakao.maps.services.Status.OK) {
               const nearby = data.slice(0, 5);
               setPlaces(nearby);
 
               const newMarkers = nearby.map((place) => {
-                const marker = new window.kakao.maps.Marker({
+                const marker = new kakao.maps.Marker({
                   map: kakaoMap,
-                  position: new window.kakao.maps.LatLng(place.y, place.x),
+                  position: new kakao.maps.LatLng(place.y, place.x),
                   title: place.place_name,
                 });
                 return marker;
               });
+
               setMarkers(newMarkers);
             }
-          }, {
+          },
+          {
             location: locPosition,
             radius: 5000,
-            sort: window.kakao.maps.services.SortBy.DISTANCE,
-          });
-        });
-      }
-    };
-    document.head.appendChild(script);
-  }, []);
+            sort: kakao.maps.services.SortBy.DISTANCE,
+          }
+        );
+      });
+    }
+  };
 
   const handleClick = (idx) => {
     if (!map) return;
     const marker = markers[idx];
-    
+
     map.setCenter(marker.getPosition());
 
     if (selectedMarker) {
-      selectedMarker.setImage(null); // 기존 강조 해제
+      selectedMarker.setImage(null);
     }
 
-    const imageSrc = "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png"; // 빨간 핀
+    const imageSrc =
+      "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png";
     const imageSize = new window.kakao.maps.Size(40, 40);
     const markerImage = new window.kakao.maps.MarkerImage(imageSrc, imageSize);
     marker.setImage(markerImage);
