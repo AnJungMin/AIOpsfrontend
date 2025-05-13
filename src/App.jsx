@@ -6,6 +6,7 @@ import Result from "./pages/Result";
 import ProductList from "./pages/ProductList";
 import ProductDetail from "./pages/ProductDetail";
 import MapPage from "./pages/MapPage";
+import CommunityPage from "./pages/CommunityPage";
 
 // ✅ 임시 컴포넌트 (없으면 에러)
 const CommunityPage = () => <div className="p-6">커뮤니티 준비 중입니다.</div>;
@@ -24,6 +25,7 @@ function App() {
         <Route path="/community" element={<CommunityPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/map" element={<MapPage />} />
+        <Route path="/community" element={<CommunityPage />} />
       </Routes>
     </>
   );
