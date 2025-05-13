@@ -76,7 +76,7 @@ export default function ProductDetail() {
         </div>
 
         {/* 리뷰 + 댓글 */}
-        <h3 className="text-lg font-semibold mb-2">구매자 리뷰</h3>
+        <h3 className="text-lg font-semibold mb-2">제품 커뮤니티</h3>
         <ul className="space-y-6">
           {product.reviews.map((r, i) => (
             <li key={i} className="p-4 border rounded-lg bg-white dark:bg-gray-800 shadow-sm">
