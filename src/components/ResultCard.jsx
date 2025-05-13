@@ -1,11 +1,10 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function ResultCard({ item, recommendationsJson }) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
-  // ✅ 명칭 변경 완료
   const severityMapping = {
     정상: "양호",
     경증: "경증",
@@ -66,7 +65,7 @@ export default function ResultCard({ item, recommendationsJson }) {
         </span>
       </div>
 
-      {/* ✅ 신뢰도 텍스트 삭제하고 Progress Bar만 남김 */}
+      {/* Progress Bar */}
       <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mb-2 overflow-hidden">
         <div
           className={`h-2 ${severityBarColor[severity]}`}
@@ -74,7 +73,7 @@ export default function ResultCard({ item, recommendationsJson }) {
         />
       </div>
 
-      {/* 클릭하면 열리는 상세 영역 */}
+      {/* 상세 내용 */}
       {open && (
         <div className="text-sm mt-4 space-y-4">
           {severity === "양호" && (
@@ -94,9 +93,11 @@ export default function ResultCard({ item, recommendationsJson }) {
                   const similarityBarColor = similarity >= 90 ? "bg-green-400" : "bg-blue-400";
 
                   return (
-                    <div
+                    <Link
+                      to="/products"
                       key={idx}
-                      className="p-4 border rounded-xl shadow-sm hover:shadow-md bg-gray-50 dark:bg-gray-700 transition"
+                      className="block p-4 border rounded-xl shadow-sm hover:shadow-md bg-gray-50 dark:bg-gray-700 transition"
+                      onClick={(e) => e.stopPropagation()} // 카드 전체 열림 방지
                     >
                       <div className="font-medium text-gray-800 dark:text-white">{rec.product_name}</div>
                       <div className="text-xs text-gray-500 dark:text-gray-300">{rec.category}</div>
@@ -111,7 +112,7 @@ export default function ResultCard({ item, recommendationsJson }) {
                       <div className="text-xs text-gray-400">
                         유사도 {similarity}%
                       </div>
-                    </div>
+                    </Link>
                   );
                 })}
               </div>
