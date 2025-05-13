@@ -7,27 +7,24 @@ export default function MapPage() {
   const [selectedMarker, setSelectedMarker] = useState(null);
 
   useEffect(() => {
-    // window.kakao가 이미 있으면 중복 로딩 방지
-    if (window.kakao && window.kakao.maps) {
-      initializeMap();
-    } else {
-      const script = document.createElement("script");
-      script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=6a6492f8fb8e1c114d50540c547a6b65&autoload=false&libraries=services`;
-      script.async = true;
-      script.onload = () => {
-        window.kakao.maps.load(() => {
-          initializeMap();
-        });
-      };
-      document.head.appendChild(script);
-    }
+    const script = document.createElement("script");
+    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=6a6492f8fb8e1c114d50540c547a6b65&autoload=false&libraries=services`;
+    script.async = true;
+
+    script.onload = () => {
+      window.kakao.maps.load(() => {
+        initializeMap();
+      });
+    };
+
+    document.head.appendChild(script);
   }, []);
 
   const initializeMap = () => {
-    const container = document.getElementById("map");
-    if (!container) return;
-
     const kakao = window.kakao;
+    const container = document.getElementById("map");
+    if (!container || !kakao) return;
+
     const options = {
       center: new kakao.maps.LatLng(37.5665, 126.9780),
       level: 5,
@@ -87,11 +84,10 @@ export default function MapPage() {
     map.setCenter(marker.getPosition());
 
     if (selectedMarker) {
-      selectedMarker.setImage(null);
+      selectedMarker.setImage(null); // 강조 제거
     }
 
-    const imageSrc =
-      "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png";
+    const imageSrc = "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png";
     const imageSize = new window.kakao.maps.Size(40, 40);
     const markerImage = new window.kakao.maps.MarkerImage(imageSrc, imageSize);
     marker.setImage(markerImage);
