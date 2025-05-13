@@ -1,3 +1,4 @@
+// pages/MapPage.jsx
 import { useEffect, useState } from "react";
 
 export default function MapPage() {
@@ -7,23 +8,26 @@ export default function MapPage() {
   const [selectedMarker, setSelectedMarker] = useState(null);
 
   useEffect(() => {
-    const script = document.createElement("script");
-    script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=6a6492f8fb8e1c114d50540c547a6b65&autoload=false&libraries=services`;
-    script.async = true;
-
-    script.onload = () => {
-      window.kakao.maps.load(() => {
-        initializeMap();
-      });
-    };
-
-    document.head.appendChild(script);
+    // 이미 로딩된 경우 중복 방지
+    if (window.kakao && window.kakao.maps) {
+      initKakaoMap();
+    } else {
+      const script = document.createElement("script");
+      script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=6a6492f8fb8e1c114d50540c547a6b65&autoload=false&libraries=services`;
+      script.async = true;
+      script.onload = () => {
+        window.kakao.maps.load(() => {
+          initKakaoMap();
+        });
+      };
+      document.head.appendChild(script);
+    }
   }, []);
 
-  const initializeMap = () => {
+  const initKakaoMap = () => {
     const kakao = window.kakao;
     const container = document.getElementById("map");
-    if (!container || !kakao) return;
+    if (!container) return;
 
     const options = {
       center: new kakao.maps.LatLng(37.5665, 126.9780),
@@ -48,58 +52,52 @@ export default function MapPage() {
         kakaoMap.setCenter(locPosition);
 
         const ps = new kakao.maps.services.Places();
-        ps.keywordSearch(
-          "피부과",
-          (data, status) => {
-            if (status === kakao.maps.services.Status.OK) {
-              const nearby = data.slice(0, 5);
-              setPlaces(nearby);
-
-              const newMarkers = nearby.map((place) => {
-                const marker = new kakao.maps.Marker({
-                  map: kakaoMap,
-                  position: new kakao.maps.LatLng(place.y, place.x),
-                  title: place.place_name,
-                });
-                return marker;
+        ps.keywordSearch("피부과", (data, status) => {
+          if (status === kakao.maps.services.Status.OK) {
+            const newMarkers = data.slice(0, 5).map((place) => {
+              const marker = new kakao.maps.Marker({
+                map: kakaoMap,
+                position: new kakao.maps.LatLng(place.y, place.x),
+                title: place.place_name,
               });
+              return marker;
+            });
 
-              setMarkers(newMarkers);
-            }
-          },
-          {
-            location: locPosition,
-            radius: 5000,
-            sort: kakao.maps.services.SortBy.DISTANCE,
+            setPlaces(data.slice(0, 5));
+            setMarkers(newMarkers);
           }
-        );
+        }, {
+          location: locPosition,
+          radius: 5000,
+          sort: kakao.maps.services.SortBy.DISTANCE,
+        });
       });
     }
   };
 
   const handleClick = (idx) => {
-    if (!map) return;
-    const marker = markers[idx];
+    if (!map || !markers[idx]) return;
 
+    const kakao = window.kakao;
+    const marker = markers[idx];
     map.setCenter(marker.getPosition());
 
     if (selectedMarker) {
-      selectedMarker.setImage(null); // 강조 제거
+      selectedMarker.setImage(null);
     }
 
     const imageSrc = "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png";
-    const imageSize = new window.kakao.maps.Size(40, 40);
-    const markerImage = new window.kakao.maps.MarkerImage(imageSrc, imageSize);
+    const imageSize = new kakao.maps.Size(40, 40);
+    const markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize);
     marker.setImage(markerImage);
 
     setSelectedMarker(marker);
   };
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">주변 피부과 추천</h2>
-      <div id="map" className="w-full h-[500px] rounded-xl shadow mb-6" />
-
+    <div className="p-6">
+      <h2 className="text-2xl font-bold mb-4">주변 피부과 추천</h2>
+      <div id="map" className="w-full h-[500px] rounded-lg shadow mb-6" />
       <div className="space-y-3">
         {places.map((place, idx) => (
           <div
