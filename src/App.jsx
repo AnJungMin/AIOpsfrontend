@@ -9,7 +9,6 @@ import MapPage from "./pages/MapPage";
 import CommunityPage from "./pages/CommunityPage";
 
 // ✅ 임시 컴포넌트 (없으면 에러)
-const CommunityPage = () => <div className="p-6">커뮤니티 준비 중입니다.</div>;
 const LoginPage = () => <div className="p-6">로그인 페이지 준비 중입니다.</div>;
 
 function App() {
