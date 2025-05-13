@@ -3,9 +3,12 @@ import Header from "./components/Header";
 import Home from "./pages/Home";
 import Diagnosis from "./pages/DiagnosisPage";
 import Result from "./pages/Result";
-import ProductPage from "./pages/ProductPage";
 import ProductList from "./pages/ProductList";
 import ProductDetail from "./pages/ProductDetail";
+
+// ✅ 임시 컴포넌트 (없으면 에러)
+const CommunityPage = () => <div className="p-6">커뮤니티 준비 중입니다.</div>;
+const LoginPage = () => <div className="p-6">로그인 페이지 준비 중입니다.</div>;
 
 function App() {
   return (
@@ -15,15 +18,13 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/diagnosis" element={<Diagnosis />} />
         <Route path="/result" element={<Result />} />
-        <Route path="/products" element={<ProductPage />} />
-        <Route path="/community" element={<CommunityPage />} />
-        <Route path="/login" element={<LoginPage />} />
         <Route path="/products" element={<ProductList />} />
         <Route path="/products/:id" element={<ProductDetail />} />
+        <Route path="/community" element={<CommunityPage />} />
+        <Route path="/login" element={<LoginPage />} />
       </Routes>
     </>
   );
 }
-
 
 export default App;
