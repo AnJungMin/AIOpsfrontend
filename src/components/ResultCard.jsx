@@ -94,7 +94,7 @@ export default function ResultCard({ item, recommendationsJson }) {
 
                   return (
                     <Link
-                      to="/products"
+                      to="/products/1"
                       key={idx}
                       className="block p-4 border rounded-xl shadow-sm hover:shadow-md bg-gray-50 dark:bg-gray-700 transition"
                       onClick={(e) => e.stopPropagation()} // 카드 전체 열림 방지
