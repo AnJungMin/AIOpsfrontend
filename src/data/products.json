@@ -1,0 +1,67 @@
+[
+  {
+    "id": 1,
+    "name": "두피 케어 샴푸",
+    "price": 32000,
+    "image": "/images/shampoo.png",
+    "scalpTypes": ["지성 두피", "건성 두피"],
+    "rating": 4.8,
+    "reviews": [
+      {
+        "user": "김두피",
+        "type": "지성 두피",
+        "content": "두피가 시원하고 기름기가 잡혔어요."
+      },
+      {
+        "user": "박건강",
+        "type": "건성 두피",
+        "content": "사용 후 두피 가려움이 줄었어요!"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "스칼프 토너",
+    "price": 28000,
+    "image": "/images/toner.png",
+    "scalpTypes": ["민감성 두피"],
+    "rating": 4.5,
+    "reviews": [
+      {
+        "user": "민감러",
+        "type": "민감성 두피",
+        "content": "자극 없이 촉촉하게 진정돼요."
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "두피 영양제",
+    "price": 45000,
+    "image": "/images/essence.png",
+    "scalpTypes": ["탈모성 두피", "지성 두피"],
+    "rating": 4.7,
+    "reviews": [
+      {
+        "user": "탈모예방러",
+        "type": "탈모성 두피",
+        "content": "빠지는 양이 줄었고 머리가 튼튼해졌어요!"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "헤어 에센스",
+    "price": 35000,
+    "image": "/images/hair_essence.png",
+    "scalpTypes": ["모발 보습", "건성 두피"],
+    "rating": 4.6,
+    "reviews": [
+      {
+        "user": "수분러버",
+        "type": "건성 두피",
+        "content": "보습감이 좋고 향도 은은해요."
+      }
+    ]
+  }
+]
