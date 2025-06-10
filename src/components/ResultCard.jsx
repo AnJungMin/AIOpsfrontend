@@ -99,21 +99,18 @@ export default function ResultCard({ item, recommendationsJson }) {
                       ▶ 코사인 유사도: {(rec.similarity * 100).toFixed(2)}%
                     </span>
                   </div>
-                  {/* 성분 체크박스 리스트 */}
+                  {/* ✅ 체크된(포함된) 성분만 표시 */}
                   <div className="flex flex-wrap gap-2 mt-1">
-                    {goodTokens.map((token, tIdx) => (
-                      <span
-                        key={tIdx}
-                        className={
-                          "flex items-center px-2 py-1 rounded text-xs border " +
-                          (rec.top_tokens.includes(token)
-                            ? "bg-green-100 border-green-400 text-green-700"
-                            : "bg-gray-100 border-gray-300 text-gray-400 line-through")
-                        }
-                      >
-                        {rec.top_tokens.includes(token) ? "✔️" : "✖️"} {token}
-                      </span>
-                    ))}
+                    {goodTokens
+                      .filter(token => rec.top_tokens.includes(token))
+                      .map((token, tIdx) => (
+                        <span
+                          key={tIdx}
+                          className="flex items-center px-2 py-1 rounded text-xs border bg-green-100 border-green-400 text-green-700"
+                        >
+                          ✔️ {token}
+                        </span>
+                      ))}
                   </div>
                 </div>
               ))}
