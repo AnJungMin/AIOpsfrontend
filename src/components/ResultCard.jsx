@@ -5,52 +5,51 @@ export default function ResultCard({ item, recommendationsJson }) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
+  // 3단계 매핑 (중등증/중등도 제거!)
   const severityMapping = {
     정상: "양호",
     경증: "경증",
-    중등증: "중등도",
     중증: "중증",
   };
 
   const severityStyle = {
     양호: "bg-green-100 text-green-800",
     경증: "bg-yellow-100 text-yellow-800",
-    중등도: "bg-orange-100 text-orange-800",
     중증: "bg-red-100 text-red-800",
   };
 
   const severityBarColor = {
     양호: "bg-green-400",
     경증: "bg-yellow-400",
-    중등도: "bg-orange-400",
     중증: "bg-red-400",
   };
 
   const handleClick = () => setOpen(!open);
 
   const cleanKey = item.disease?.trim();
-  const recsFromJson = recommendationsJson?.[cleanKey] || [];
+  const diseaseInfo = recommendationsJson?.disease_info?.[cleanKey] || {};
+  const goodTokens = diseaseInfo.good_tokens || [];
+  const recsFromJson = recommendationsJson?.recommendations?.[cleanKey] || [];
 
+  // confidence 정수 변환
   const rawConfidence = item.confidence || "0";
   const numericConfidence = parseFloat(
     typeof rawConfidence === "string" ? rawConfidence.replace("%", "") : rawConfidence
   );
 
+  // severity 3단계 매핑 적용
   const originalSeverity = item.severity || "정상";
   const severity = severityMapping[originalSeverity] || "양호";
 
-  const baseFill = {
-    양호: 0,
-    경증: 25,
-    중등도: 50,
-    중증: 75,
-  }[severity] || 0;
-
-  const remainingFill = 25;
+  // 게이지 바: 3단계 구간 내 confidence 반영
+  const stepRanges = {
+    양호: [0, 33.33],
+    경증: [33.33, 66.66],
+    중증: [66.66, 100],
+  };
+  const [minPercent, maxPercent] = stepRanges[severity] || [0, 33.33];
   const confidenceRate = Math.min(1, numericConfidence / 100);
-  const additionalFill = remainingFill * confidenceRate;
-
-  const totalFillPercent = Math.min(100, baseFill + additionalFill);
+  const totalFillPercent = minPercent + (maxPercent - minPercent) * confidenceRate;
 
   return (
     <div
@@ -82,40 +81,42 @@ export default function ResultCard({ item, recommendationsJson }) {
             </p>
           )}
 
-          {(severity === "경증" || severity === "중등도") && recsFromJson.length > 0 && (
-            <div className="space-y-2">
-              <strong className="block font-semibold text-gray-800 dark:text-gray-200">
-                추천 제품
-              </strong>
-              <div className="grid gap-3">
-                {recsFromJson.map((rec, idx) => {
-                  const similarity = (rec.similarity * 100).toFixed(2);
-                  const similarityBarColor = similarity >= 90 ? "bg-green-400" : "bg-blue-400";
-
-                  return (
-                    <Link
-                      to="/products/1"
-                      key={idx}
-                      className="block p-4 border rounded-xl shadow-sm hover:shadow-md bg-gray-50 dark:bg-gray-700 transition"
-                      onClick={(e) => e.stopPropagation()} // 카드 전체 열림 방지
-                    >
-                      <div className="font-medium text-gray-800 dark:text-white">{rec.product_name}</div>
-                      <div className="text-xs text-gray-500 dark:text-gray-300">{rec.category}</div>
-
-                      <div className="w-full bg-gray-200 rounded-full h-2 my-2">
-                        <div
-                          className={`h-2 ${similarityBarColor} rounded-full`}
-                          style={{ width: `${similarity}%` }}
-                        />
-                      </div>
-
-                      <div className="text-xs text-gray-400">
-                        유사도 {similarity}%
-                      </div>
-                    </Link>
-                  );
-                })}
+          {severity === "경증" && recsFromJson.length > 0 && (
+            <div className="space-y-3">
+              <div className="font-semibold text-gray-800 dark:text-gray-200">
+                ▶ 질환별 좋은 성분 리스트:{" "}
+                <span className="font-normal">{goodTokens.join(", ")}</span>
               </div>
+              {recsFromJson.map((rec, idx) => (
+                <div
+                  key={idx}
+                  className="p-4 border rounded-xl bg-gray-50 dark:bg-gray-700 mb-2 shadow-sm"
+                >
+                  <div className="font-medium text-gray-900 dark:text-white">{rec.product_name}</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-300 mb-1">{rec.category}</div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xs font-mono text-blue-600">
+                      ▶ 코사인 유사도: {(rec.similarity * 100).toFixed(2)}%
+                    </span>
+                  </div>
+                  {/* 성분 체크박스 리스트 */}
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    {goodTokens.map((token, tIdx) => (
+                      <span
+                        key={tIdx}
+                        className={
+                          "flex items-center px-2 py-1 rounded text-xs border " +
+                          (rec.top_tokens.includes(token)
+                            ? "bg-green-100 border-green-400 text-green-700"
+                            : "bg-gray-100 border-gray-300 text-gray-400 line-through")
+                        }
+                      >
+                        {rec.top_tokens.includes(token) ? "✔️" : "✖️"} {token}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           )}
 
