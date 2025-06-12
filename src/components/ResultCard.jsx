@@ -44,8 +44,8 @@ export default function ResultCard({ item, recommendationsJson }) {
   // 게이지 바: 3단계 구간 내 confidence 반영
   const stepRanges = {
     양호: [0, 33.33],
-    경증: [33.33, 66.66],
-    중증: [66.66, 100],
+    제품추천: [33.33, 66.66],
+    병원추천: [66.66, 100],
   };
   const [minPercent, maxPercent] = stepRanges[severity] || [0, 33.33];
   const confidenceRate = Math.min(1, numericConfidence / 100);
