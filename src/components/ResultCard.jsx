@@ -8,8 +8,8 @@ export default function ResultCard({ item, recommendationsJson }) {
   // 3단계 매핑 (중등증/중등도 제거!)
   const severityMapping = {
     정상: "양호",
-    경증: "경증",
-    중증: "중증",
+    경증: "제품추천",
+    중증: "병원추천",
   };
 
   const severityStyle = {
