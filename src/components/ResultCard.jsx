@@ -14,14 +14,14 @@ export default function ResultCard({ item, recommendationsJson }) {
 
   const severityStyle = {
     양호: "bg-green-100 text-green-800",
-    경증: "bg-yellow-100 text-yellow-800",
-    중증: "bg-red-100 text-red-800",
+    제품추천: "bg-yellow-100 text-yellow-800",
+    병원추천: "bg-red-100 text-red-800",
   };
 
   const severityBarColor = {
     양호: "bg-green-400",
-    경증: "bg-yellow-400",
-    중증: "bg-red-400",
+    제품추천: "bg-yellow-400",
+    병원추천: "bg-red-400",
   };
 
   const handleClick = () => setOpen(!open);
