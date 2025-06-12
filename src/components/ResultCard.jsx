@@ -81,7 +81,7 @@ export default function ResultCard({ item, recommendationsJson }) {
             </p>
           )}
 
-          {severity === "경증" && recsFromJson.length > 0 && (
+          {severity === "제품추천" && recsFromJson.length > 0 && (
             <div className="space-y-3">
               <div className="font-semibold text-gray-800 dark:text-gray-200">
                 ▶ 질환별 좋은 성분 리스트:{" "}
@@ -117,7 +117,7 @@ export default function ResultCard({ item, recommendationsJson }) {
             </div>
           )}
 
-          {severity === "중증" && (
+          {severity === "병원추천" && (
             <div className="space-y-3">
               <p className="text-red-600 font-semibold">
                 {item.hospital_recommendation || "증상이 심각할 수 있어 피부과 방문을 권장합니다."}
